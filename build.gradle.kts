@@ -20,6 +20,7 @@ dependencies {
     // JUnit 5
         testImplementation(platform("org.junit:junit-bom:5.12.1"))
         testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
         // Hamcrest
         testImplementation("org.hamcrest:hamcrest:2.2")
