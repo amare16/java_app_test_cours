@@ -11,4 +11,13 @@ public class GavTest {
 
         assertEquals("org.acme", gav.group());
     }
+
+    @Test
+    void parseGavShouldReturnCorrectGroupArtifactAndVersion() {
+        Gav gav = Gav.parse("org.other:lib-c:3.0.0");
+
+        assertEquals("org.other", gav.group());
+        assertEquals("lib-c", gav.artifact());
+        assertEquals("3.0.0", gav.version());
+    }
 }
