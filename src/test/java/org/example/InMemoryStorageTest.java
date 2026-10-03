@@ -46,4 +46,18 @@ public class InMemoryStorageTest {
         // The retrieved artifact should be the one we stored.
         assertEquals(artifact, result.get());
     }
+
+    @Test
+    void getShouldReturnEmptyWhenArtifactDoesNotExist() {
+
+        // Create a valid GAV that has NOT been stored.
+        Gav gav = Gav.parse("org.acme:unknown:1.0.0");
+
+        // Search for the absent coordinate.
+        Optional<Artifact> result = storage.get(gav);
+
+        // The storage should explicitly represent "not found"
+        // with Optional.empty().
+        assertTrue(result.isEmpty());
+    }
 }
