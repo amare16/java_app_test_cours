@@ -4,7 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+// Hamcrest assertion method.
+import static org.hamcrest.MatcherAssert.assertThat;
+
+// Hamcrest matcher used to compare an actual value with an expected value.
+import static org.hamcrest.Matchers.is;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GavTest {
@@ -19,9 +24,36 @@ public class GavTest {
     ) {
         Gav gav = Gav.parse(input);
 
-        assertEquals(expectedGroup, gav.group());
-        assertEquals(expectedArtifact, gav.artifact());
-        assertEquals(expectedVersion, gav.version());
+        // JUnit
+        //assertEquals(expectedGroup, gav.group());
+
+        // Hamcrest version for the group.
+        assertThat(gav.group(), is(expectedGroup));
+
+        // TEMPORARY FAILURE:
+        // We deliberately expect a wrong value to observe
+        // the failure message produced by JUnit assertEquals.
+        //assertEquals("WRONG-GROUP", gav.group());
+
+        // TEMPORARY FAILURE:
+        // We deliberately expect a wrong value to observe
+        // the failure message produced by Hamcrest assertThat.
+        // assertThat(gav.group(), is("WRONG-GROUP"));
+
+        // Junit
+        //assertEquals(expectedArtifact, gav.artifact());
+
+        // Hamcrest verifies that the actual artifact
+        // matches the expected artifact.
+        assertThat(gav.artifact(), is(expectedArtifact));
+
+        // Junit assertEquals
+        //assertEquals(expectedVersion, gav.version());
+
+        // Hamcrest verifies that the actual version
+        // matches the expected version.
+        assertThat(gav.version(), is(expectedVersion));
+
     }
 
     @Test
