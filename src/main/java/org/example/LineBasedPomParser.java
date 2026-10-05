@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,18 +28,43 @@ public class LineBasedPomParser implements IPomParser {
         }
 
         // Q14.2:
-        // A line beginning with "project " declares the project name.
+        // The first line must declare the project.
         if (line.startsWith("project ")) {
-
-            // Remove the "project " prefix to obtain only the project name.
+            // Extract the project name after "project ".
             String projectName = line.substring("project ".length());
 
-            // At this stage of TDD, dependencies are not handled yet.
-            // Therefore, the project contains an empty dependency set.
-            return new Project(projectName, Set.of());
+            // Store the direct dependencies found in the file.
+            Set<Gav> dependencies = new HashSet<>();
+
+            // Q14.3:
+            // Continue reading the remaining lines.
+            line = reader.readLine();
+
+            while (line != null) {
+
+                // A dependency line contains a GAV coordinate
+                // after the "dependency " prefix.
+                if (line.startsWith("dependency ")) {
+
+                    String gavText =
+                            line.substring("dependency ".length());
+
+                    // Gav.parse converts the textual coordinate
+                    // into a Gav object.
+                    Gav gav = Gav.parse(gavText);
+
+                    dependencies.add(gav);
+                }
+
+                // Read the next line.
+                line = reader.readLine();
+            }
+
+            // Return the final state produced by the parser.
+            return new Project(projectName, dependencies);
         }
 
-        // Other input formats will be handled in later TDD cycles.
+        // Other malformed inputs will be handled in later TDD cycles.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

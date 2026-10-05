@@ -51,4 +51,32 @@ public class Gav {
     public String version() {
         return version;
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+
+        // Same object in memory -> necessarily equal.
+        if (this == obj) {
+            return true;
+        }
+
+        // The other object must also be a Gav.
+        if (!(obj instanceof Gav other)) {
+            return false;
+        }
+
+        // Two GAVs are equal when their three components are equal.
+        return group.equals(other.group)
+                && artifact.equals(other.artifact)
+                && version.equals(other.version);
+    }
+
+    @Override
+    public int hashCode() {
+
+        // Equal GAVs must produce the same hash code.
+        // This is especially important when Gav is stored in a Set or used as a Map key.
+        return java.util.Objects.hash(group, artifact, version);
+    }
 }
