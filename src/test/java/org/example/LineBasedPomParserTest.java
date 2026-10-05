@@ -1,0 +1,45 @@
+package org.example;
+
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for LineBasedPomParser.
+ *
+ * ILineReader will be replaced by a Mockito test double,
+ * so these tests do not depend on a real file.
+ */
+
+public class LineBasedPomParserTest {
+    /**
+     * Q14.1 - Empty file.
+     *
+     * Test description:
+     * [ILineReader | readLine ↦ ⊥]s
+     * ⊢ parse(reader) ⇒ ⊥
+     */
+    @Test
+    void parseShouldReturnNullForEmptyFile() throws IOException {
+        // Create a test double for the parser's collaborator.
+        ILineReader reader = mock(ILineReader.class);
+
+        // Configure the double as a Stub:
+        // null means that there is no line to read, so the file is empty.
+        when(reader.readLine()).thenReturn(null);
+
+        // SUT: the real component that we want to test.
+        LineBasedPomParser parser = new LineBasedPomParser();
+
+        // Execute the behavior under test.
+        Project project = parser.parse(reader);
+
+        // State-oriented assertion:
+        // for Q14.1, we choose null as the result for an empty file.
+        assertNull(project);
+    }
+}
