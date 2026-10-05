@@ -1,8 +1,6 @@
 package org.example;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,49 +20,50 @@ public class LineBasedPomParser implements IPomParser {
         String line = reader.readLine();
 
         // Q14.1:
-        // If there is no first line, the file is empty.
+        // No first line means that the file is empty.
         if (line == null) {
             return null;
         }
 
-        // Q14.2:
-        // The first line must declare the project.
-        if (line.startsWith("project ")) {
-            // Extract the project name after "project ".
-            String projectName = line.substring("project ".length());
-
-            // Store the direct dependencies found in the file.
-            Set<Gav> dependencies = new HashSet<>();
-
-            // Q14.3:
-            // Continue reading the remaining lines.
-            line = reader.readLine();
-
-            while (line != null) {
-
-                // A dependency line contains a GAV coordinate
-                // after the "dependency " prefix.
-                if (line.startsWith("dependency ")) {
-
-                    String gavText =
-                            line.substring("dependency ".length());
-
-                    // Gav.parse converts the textual coordinate
-                    // into a Gav object.
-                    Gav gav = Gav.parse(gavText);
-
-                    dependencies.add(gav);
-                }
-
-                // Read the next line.
-                line = reader.readLine();
-            }
-
-            // Return the final state produced by the parser.
-            return new Project(projectName, dependencies);
+        // The cases currently implemented require
+        // the first line to declare the project.
+        if (!line.startsWith("project ")) {
+            throw new UnsupportedOperationException("Not implemented yet");
         }
 
-        // Other malformed inputs will be handled in later TDD cycles.
+        // Q14.2:
+        // Extract the project name from the declaration.
+        String projectName = line.substring("project ".length());
+
+        // Read the next line.
+        String nextLine = reader.readLine();
+
+        // Q14.2:
+        // If there is no next line, the project
+        // has no declared dependencies.
+        if (nextLine == null) {
+            return new Project(projectName, Set.of());
+        }
+
+        // Q14.3:
+        // At this stage of TDD, we handle exactly
+        // one dependency declaration.
+        if (nextLine.startsWith("dependency ")) {
+
+            // Extract the textual GAV coordinate.
+            String gavText =
+                    nextLine.substring("dependency ".length());
+
+            // Convert the coordinate into a Gav object.
+            Gav gav = Gav.parse(gavText);
+
+            // Return a project containing this one dependency.
+            return new Project(projectName, Set.of(gav));
+        }
+
+        // Empty lines and multiple dependencies
+        // are intentionally not handled yet.
+        // They belong to the next TDD cycle, Q14.4.
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
