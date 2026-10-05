@@ -3,7 +3,9 @@ package org.example;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,5 +43,31 @@ public class LineBasedPomParserTest {
         // State-oriented assertion:
         // for Q14.1, we choose null as the result for an empty file.
         assertNull(project);
+    }
+
+    @Test
+    void parseShouldReturnProjectWithNoDependencies() throws IOException {
+
+        // Create a test double for the parser's collaborator.
+        ILineReader reader = mock(ILineReader.class);
+
+        // Configure it as a Stub:
+        // first call -> the project declaration
+        // second call -> null, meaning end of input.
+        when(reader.readLine()).thenReturn(
+                "project mon-app",
+                null
+        );
+
+        // SUT: the real parser that we are testing.
+        LineBasedPomParser parser = new LineBasedPomParser();
+
+        // Parse the simulated build file.
+        Project project = parser.parse(reader);
+
+        // State-oriented assertions:
+        // we verify the Project returned by the parser.
+        assertEquals("mon-app", project.name());
+        assertEquals(Set.of(), project.dependencies());
     }
 }
