@@ -207,4 +207,40 @@ public class LineBasedPomParserTest {
                 () -> parser.parse(reader)
         );
     }
+
+    /**
+     * Q14.5 - Malformed file: invalid GAV coordinate.
+     *
+     * Test description:
+     * [ILineReader | readLine ↦ ⟨
+     *     "project mon-app",
+     *     "dependency invalid-coordinate",
+     *     ⊥
+     * ⟩]s
+     * ⊢ parse(reader) ⇒ ↯ IllegalArgumentException
+     */
+    @Test
+    void parseShouldRejectInvalidDependencyCoordinate() throws IOException {
+
+        // Create a test double for the parser's collaborator.
+        ILineReader reader = mock(ILineReader.class);
+
+        // Configure the Stub with a dependency whose coordinate
+        // does not respect the required group:artifact:version format.
+        when(reader.readLine()).thenReturn(
+                "project mon-app",
+                "dependency invalid-coordinate",
+                (String) null
+        );
+
+        // SUT: the real parser.
+        LineBasedPomParser parser = new LineBasedPomParser();
+
+        // Gav.parse() already rejects malformed coordinates.
+        // Therefore the parser must propagate that failure.
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parse(reader)
+        );
+    }
 }
