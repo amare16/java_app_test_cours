@@ -7,6 +7,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -168,6 +169,42 @@ public class LineBasedPomParserTest {
                         Gav.parse("org.acme:lib-b:2.1.0")
                 ),
                 project.dependencies()
+        );
+    }
+
+    /**
+     * Q14.5 - Malformed file: unknown line.
+     *
+     * Test description:
+     * [ILineReader | readLine ↦ ⟨
+     *     "project mon-app",
+     *     "something invalid",
+     *     ⊥
+     * ⟩]s
+     * ⊢ parse(reader) ⇒ ↯ IllegalArgumentException
+     */
+    @Test
+    void parseShouldRejectUnknownLine() throws IOException {
+
+        // Create a test double for the parser's collaborator.
+        ILineReader reader = mock(ILineReader.class);
+
+        // Configure the Stub to simulate a malformed build file.
+        // The second line is neither an empty line nor
+        // a valid "dependency ..." declaration.
+        when(reader.readLine()).thenReturn(
+                "project mon-app",
+                "something invalid",
+                (String) null
+        );
+
+        // SUT: the real parser.
+        LineBasedPomParser parser = new LineBasedPomParser();
+
+        // A malformed line must be rejected.
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parse(reader)
         );
     }
 }
