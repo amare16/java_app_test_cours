@@ -70,4 +70,36 @@ public class LineBasedPomParserTest {
         assertEquals("mon-app", project.name());
         assertEquals(Set.of(), project.dependencies());
     }
+
+    @Test
+    void parseShouldReturnProjectWithOneDependency() throws IOException {
+
+        // Create a test double for the parser's collaborator.
+        ILineReader reader = mock(ILineReader.class);
+
+        // Configure the double as a Stub.
+        // It simulates a build file containing:
+        // 1. the project declaration,
+        // 2. one dependency,
+        // 3. the end of the file.
+        when(reader.readLine()).thenReturn(
+                "project mon-app",
+                "dependency org.acme:lib-a:1.0.0",
+                (String) null
+        );
+
+        // SUT: the real parser.
+        LineBasedPomParser parser = new LineBasedPomParser();
+
+        // Parse the simulated build file.
+        Project project = parser.parse(reader);
+
+        // State-oriented assertions:
+        // verify the final Project returned by the parser.
+        assertEquals("mon-app", project.name());
+        assertEquals(
+                Set.of(Gav.parse("org.acme:lib-a:1.0.0")),
+                project.dependencies()
+        );
+    }
 }
