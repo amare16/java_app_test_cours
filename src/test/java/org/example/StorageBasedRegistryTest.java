@@ -53,4 +53,67 @@ public class StorageBasedRegistryTest {
                 () -> registry.publish(artifact)
         );
     }
+
+    @Test
+    void publishNewArtifactStoresIt() {
+
+        // Create the coordinate of a new artifact.
+        Gav gav = Gav.parse("org.acme:lib-b:1.0.0");
+
+        // Create an artifact without dependencies.
+        Artifact artifact = new Artifact(gav, Set.of());
+
+        // Create an empty manual storage Stub.
+        StorageStub storage = new StorageStub(null);
+
+        // Inject the Stub into the registry.
+        StorageBasedRegistry registry = new StorageBasedRegistry(storage);
+
+        // Publish the new artifact.
+        registry.publish(artifact);
+
+        // Verify that the artifact was saved in storage.
+        assertEquals(Optional.of(artifact), storage.get(gav));
+    }
+
+    @Test
+    void lookupExistingArtifactReturnsIt() {
+
+        // Create the artifact's unique coordinate.
+        Gav gav = Gav.parse("org.acme:lib-a:1.0.0");
+
+        // Create an artifact without dependencies.
+        Artifact artifact = new Artifact(gav, Set.of());
+
+        // Create a Stub that already contains the artifact.
+        IStorage storage = new StorageStub(artifact);
+
+        // Inject the Stub into the registry.
+        StorageBasedRegistry registry = new StorageBasedRegistry(storage);
+
+        // Search for the artifact using its GAV.
+        Optional<Artifact> result = registry.lookup(gav);
+
+        // Verify that lookup returns the expected artifact.
+        assertEquals(Optional.of(artifact), result);
+    }
+
+    @Test
+    void lookupMissingArtifactReturnsEmpty() {
+
+        // Create the coordinate of an artifact we want to find.
+        Gav gav = Gav.parse("org.acme:missing:1.0.0");
+
+        // Create an empty storage Stub.
+        IStorage storage = new StorageStub(null);
+
+        // Inject the empty Stub into our registry.
+        StorageBasedRegistry registry = new StorageBasedRegistry(storage);
+
+        // Search for the artifact.
+        Optional<Artifact> result = registry.lookup(gav);
+
+        // Verify that no artifact was found.
+        assertEquals(Optional.empty(), result);
+    }
 }
