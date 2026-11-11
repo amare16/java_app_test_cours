@@ -37,8 +37,8 @@ public class LineBasedPomParser implements IPomParser {
         String projectName = line.substring("project ".length());
 
         // Q14.4:
-        // We now need a collection because the project may contain
-        // several direct dependencies.
+        // A project may contain several direct dependencies,
+        // so we use a Set to collect them.
         Set<Gav> dependencies = new HashSet<>();
 
         // Read the first line after the project declaration.
@@ -46,11 +46,10 @@ public class LineBasedPomParser implements IPomParser {
 
         // Q14.4:
         // Continue reading until the end of the input.
-        // This extends Q14.3 from one dependency to several dependencies.
         while (line != null) {
 
             // Q14.4:
-            // Empty lines are allowed and must simply be ignored.
+            // Empty lines are valid and must simply be ignored.
             if (line.isEmpty()) {
                 line = reader.readLine();
                 continue;
@@ -65,13 +64,26 @@ public class LineBasedPomParser implements IPomParser {
                 String gavText =
                         line.substring("dependency ".length());
 
-                // Convert and validate the textual coordinate.
+                // Q14.5:
+                // Gav.parse() validates the coordinate.
+                // If the coordinate does not respect the
+                // group:artifact:version format, Gav.parse()
+                // throws IllegalArgumentException.
                 Gav gav = Gav.parse(gavText);
 
                 // Q14.3 handled one dependency.
-                // Q14.4 extends this behavior because the loop
-                // allows several dependencies to be collected.
+                // Q14.4 extends this behavior by allowing
+                // several dependencies to be collected.
                 dependencies.add(gav);
+
+            } else {
+
+                // Q14.5:
+                // A non-empty line that is not a dependency
+                // declaration is unknown and therefore malformed.
+                throw new IllegalArgumentException(
+                        "Unknown line: " + line
+                );
             }
 
             // Q14.4:
@@ -79,9 +91,11 @@ public class LineBasedPomParser implements IPomParser {
             line = reader.readLine();
         }
 
-        // Q14.2 / Q14.3 / Q14.4:
-        // Return the final Project containing its name
-        // and all direct dependencies that were found.
+        // Return the Project containing its name
+        // and all valid direct dependencies.
         return new Project(projectName, dependencies);
     }
+
+
+
 }
